@@ -274,3 +274,9 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
+
+# R stuff
+.R*
+
+# Sensitive data protection
+data/

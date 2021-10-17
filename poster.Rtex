@@ -1,0 +1,268 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Compile with XeLaTeX %
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{beamer}
+  % Beamer settings
+  \usetheme{CambridgeUS}
+  \usecolortheme{seagull}
+  \usefonttheme{professionalfonts}
+  \usefonttheme{serif}
+  \setbeamertemplate{bibliography item}{}
+
+  % Packages and settings
+  \usepackage[orientation=landscape,size=a0,scale=1.4]{beamerposter}
+  \usepackage{fontspec}
+    \setmainfont{Charis SIL}
+  \usepackage[backend=biber]{biblatex}
+    \addbibresource{References.bib}
+  \usepackage{hyperref}
+    \hypersetup{colorlinks=true, allcolors=blue}
+  \usepackage{graphicx}
+    \graphicspath{{./figure/}}
+  \usepackage{tikz}
+    \usetikzlibrary{shapes.geometric, arrows}
+    \tikzstyle{process} = [rectangle,
+                           text centered,
+                           draw=black,
+                           align=center]
+    \tikzstyle{arrow} = [ultra thick,->]
+  \usepackage{siunitx}
+    \sisetup{group-minimum-digits=4,
+             group-separator={,},
+             detect-all}
+
+  % Document info
+  \title[LOL on Twitter]{LOL on Twitter}
+  \subtitle{A test case for community detection}
+  \author[Joshua McNeill]{Joshua McNeill \\ {\tiny\href{mailto:joshua.mcneill@uga.edu}{joshua.mcneill@uga.edu} -- \href{https://twitter.com/joshisanonymous}{@joshisanonymous}}}
+  \institute{University of Georgia}
+  \date{NWAV 49, 22 October 2021}
+
+  % Custom commands
+  \newcommand{\orth}[1]{$\langle$#1$\rangle$}
+  \newcommand{\lexi}[1]{\textit{#1}}
+  \newcommand{\gloss}[1]{`#1'}
+  \newcommand{\sepunits}{\rule{1cm}{0pt}\hrulefill\rule{1cm}{0pt} \\}
+  \newcommand{\beamfont}[1]{\usebeamerfont{#1}\usebeamercolor[fg]{#1}}
+  \renewcommand*{\bibfont}{\tiny}
+
+\begin{document}
+  % knitr stuff
+  <<settings_load_scripts, echo = FALSE>>=
+  read_chunk("analysis.R")
+  opts_chunk$set(echo = FALSE,
+                 warning = FALSE,
+                 message = FALSE,
+                 results = "asis",
+                 fig.height = 6,
+                 fig.width = 6)
+  @
+  <<load_packages_functions_data>>=
+  @
+  \begin{frame}
+    %%%%%%%%%%
+    % Header %
+    %%%%%%%%%%
+    \begin{block}{}
+      \begin{columns}
+        \column{0.65\textwidth}
+          {\beamfont{title}\inserttitle} \\
+          {\beamfont{subtitle}\insertsubtitle} \\
+          {\small\beamfont{author}*Data and code available at \url{}}
+        \column{0.2\textwidth}
+          \begin{flushright}
+            \beamfont{author}\insertauthor \\
+            \beamfont{date}\insertdate
+          \end{flushright}
+        \column{0.15\textwidth}
+          \begin{center}
+            \includegraphics[scale=0.5]{uga_logo.png}
+          \end{center}
+      \end{columns}
+    \end{block}
+
+    \begin{columns}[t]
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % Left column (background) %
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      \column{0.19\textwidth}
+        \begin{block}{Background}
+          Language contact
+          \begin{itemize}
+            \item Many have theorized about the distinction between borrowings and one word code switches (i.e., nonce borrowings), typically distinguishing by frequency or linguistic intergration \parencite{matras_language_2009, myers-scotton_code-switching_2000, poplack_sometimes_2000, poplack_social_1988}
+            \item This distinction requires a strong theory of what a langauge is to begin with
+          \end{itemize}
+          Maritime provinces of Canada
+          \begin{itemize}
+            \item Where Acadian French is spoken as opposed to Quebec French \parencite{king_lexical_2000}
+            \item Unlike in Quebec, French is a clear minority language in the Maritime provinces \parencite{comeau_window_2011, king_lexical_2000}
+            \item English-origin features thus commonly appear in Acadian French \parencite{king_chiac_2008, perrot_trajet_2014}
+          \end{itemize}
+          The use of \lexi{lol} generally
+          \begin{itemize}
+            \item In English, \lexi{lol} is often considered a discourse marker \parencite{baron_see_2004, tagliamonte_linguistic_2008}
+            \item No work has been done on the use of English \lexi{lol} in French
+          \end{itemize}
+        \end{block}
+
+        \begin{block}{Research Question}
+          Does the lexical linguistic variable (lol) in French tweets vary according to detected community?
+        \end{block}
+
+        \begin{block}{Methods}
+          Data
+          \begin{itemize}
+            \item Directed tweets from the Maritime provinces of Canada between Jan-Feb, 2017
+            \item Network constructed using X tweets from Y users
+            \item Communities detected using the Louvain algorithm \parencite{blondel_fast_2008} to find the maximum modularity $Q$ \parencite{newman_finding_2004}
+          \end{itemize}
+          Linguistic variable: Lexical (lol)
+          \begin{itemize}
+            \item As used in French tweets
+            \item Variants include \lexi{lol} and its French equivalents \lexi{mdr} \gloss{mort(e) de rire} and \lexi{ptdr} \gloss{pété(e) de rire}
+          \end{itemize}
+          Independant variables
+          \begin{itemize}
+            \item Primary: Detected community
+            \item Secondary: Time zone, province, city, part-of-speech
+          \end{itemize}
+        \end{block}
+
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % Middle column (results)      %
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      \column{0.6\textwidth}
+        \begin{block}{General results (Fisher's exact and Cramér's $V$)}
+          Detected community is significant ($P < \Sexpr{round_any(fisher.test(lolByCommunity, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}, V \approx \Sexpr{round(cramersV(lolByCommunity), 2)}$ compared to $P < \Sexpr{round_any(fisher.test(lolByCity, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}, V \approx \Sexpr{round(cramersV(lolByCity), 2)}$ for city and $P < \Sexpr{round_any(fisher.test(lolByProvince, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}, V \approx \Sexpr{round(cramersV(lolByProvince), 2)}$ for province)
+          \begin{columns}[t]
+            \column{0.5\textwidth}
+              \begin{center}
+                \begin{tabular}{l r r r | r r r r}
+                  \multicolumn{8}{c}{Communities without \lexi{lol}} \\
+                  \hline
+                  \multicolumn{4}{c}{French tweets only}                                                                                             & \multicolumn{4}{c}{Whole community} \\
+                  Community & lol                                   & mdr                                   & ptdr                                   & Mode & $D$ (spread) & Members & Density \\
+                  \hline
+                  173       & \Sexpr{lolByCommunity["173", "lol"]}  & \Sexpr{lolByCommunity["173", "mdr"]}  & \Sexpr{lolByCommunity["173", "ptdr"]}  & lol  & 0.350        & 2,480   & 0.000 \\
+                  322       & \Sexpr{lolByCommunity["322", "lol"]}  & \Sexpr{lolByCommunity["322", "mdr"]}  & \Sexpr{lolByCommunity["322", "ptdr"]}  & mdr  & 0.000        & 19      & 0.053 \\
+                  572       & \Sexpr{lolByCommunity["572", "lol"]}  & \Sexpr{lolByCommunity["572", "mdr"]}  & \Sexpr{lolByCommunity["572", "ptdr"]}  & lol  & 0.179        & 3,601   & 0.000 \\
+                  1291      & \Sexpr{lolByCommunity["1291", "lol"]} & \Sexpr{lolByCommunity["1291", "mdr"]} & \Sexpr{lolByCommunity["1291", "ptdr"]} & lol  & 0.321        & 1,073   & 0.001 \\
+                  1340      & \Sexpr{lolByCommunity["1340", "lol"]} & \Sexpr{lolByCommunity["1340", "mdr"]} & \Sexpr{lolByCommunity["1340", "ptdr"]} & mdr  & 0.000        & 33      & 0.036 \\
+                  1782      & \Sexpr{lolByCommunity["1782", "lol"]} & \Sexpr{lolByCommunity["1782", "mdr"]} & \Sexpr{lolByCommunity["1782", "ptdr"]} & ptdr & 0.000        & 2       & 0.500 \\
+                  2305      & \Sexpr{lolByCommunity["2305", "lol"]} & \Sexpr{lolByCommunity["2305", "mdr"]} & \Sexpr{lolByCommunity["2305", "ptdr"]} & mdr  & 0.000        & 4       & 0.250 \\
+                  6445      & \Sexpr{lolByCommunity["6445", "lol"]} & \Sexpr{lolByCommunity["6445", "mdr"]} & \Sexpr{lolByCommunity["6445", "ptdr"]} & mdr  & 0.000        & 2       & 0.500 \\
+                  6744      & \Sexpr{lolByCommunity["6744", "lol"]} & \Sexpr{lolByCommunity["6744", "mdr"]} & \Sexpr{lolByCommunity["6744", "ptdr"]} & mdr  & 0.000        & 12      & 0.083
+                \end{tabular}
+              \end{center}
+            \column{0.5\textwidth}
+              \begin{center}
+                \begin{tabular}{l r r r | r r r r}
+                  \multicolumn{8}{c}{Communities with \lexi{lol}} \\
+                  \hline
+                  \multicolumn{4}{c}{French tweets only}                                                                                             & \multicolumn{4}{c}{Whole community} \\
+                  Community & lol                                   & mdr                                   & ptdr                                   & Mode & $D$ (spread) & Members & Density \\
+                  \hline
+                  302       & \Sexpr{lolByCommunity["302", "lol"]}  & \Sexpr{lolByCommunity["302", "mdr"]}  & \Sexpr{lolByCommunity["302", "ptdr"]}  & lol  & 0.272        & 17,279  & 0.000\\
+                  756       & \Sexpr{lolByCommunity["756", "lol"]}  & \Sexpr{lolByCommunity["756", "mdr"]}  & \Sexpr{lolByCommunity["756", "ptdr"]}  & lol  & 0.694        & 980     & 0.001 \\
+                  799       & \Sexpr{lolByCommunity["799", "lol"]}  & \Sexpr{lolByCommunity["799", "mdr"]}  & \Sexpr{lolByCommunity["799", "ptdr"]}  & mdr  & 0.180        & 33      & 0.030 \\
+                  1032      & \Sexpr{lolByCommunity["1032", "lol"]} & \Sexpr{lolByCommunity["1032", "mdr"]} & \Sexpr{lolByCommunity["1032", "ptdr"]} & lol  & 0.188        & 22,531  & 0.000 \\
+                  1097      & \Sexpr{lolByCommunity["1097", "lol"]} & \Sexpr{lolByCommunity["1097", "mdr"]} & \Sexpr{lolByCommunity["1097", "ptdr"]} & lol  & 0.152        & 2,955   & 0.000 \\
+                  1227      & \Sexpr{lolByCommunity["1227", "lol"]} & \Sexpr{lolByCommunity["1227", "mdr"]} & \Sexpr{lolByCommunity["1227", "ptdr"]} & lol  & 0.153        & 2,214   & 0.000 \\
+                  1917      & \Sexpr{lolByCommunity["1917", "lol"]} & \Sexpr{lolByCommunity["1917", "mdr"]} & \Sexpr{lolByCommunity["1917", "ptdr"]} & lol  & 0.481        & 4,432   & 0.000 \\
+                  2067      & \Sexpr{lolByCommunity["2067", "lol"]} & \Sexpr{lolByCommunity["2067", "mdr"]} & \Sexpr{lolByCommunity["2067", "ptdr"]} & mdr  & 0.616        & 44      & 0.023 \\
+                  2265      & \Sexpr{lolByCommunity["2265", "lol"]} & \Sexpr{lolByCommunity["2265", "mdr"]} & \Sexpr{lolByCommunity["2265", "ptdr"]} & lol  & 0.440        & 242     & 0.004 \\
+                  6817      & \Sexpr{lolByCommunity["6817", "lol"]} & \Sexpr{lolByCommunity["6817", "mdr"]} & \Sexpr{lolByCommunity["6817", "ptdr"]} & lol  & 0.245        & 592     & 0.002
+                \end{tabular}
+              \end{center}
+          \end{columns}
+        \end{block}
+
+        \begin{block}{Importance of community size}
+          Only the smallest communities are French dominant; All communities with >1,000 members are English dominant
+          \begin{itemize}
+            \item Having even a moderate English presence leads to a mode of \lexi{lol} overall and usage of \lexi{lol} in French tweets (e.g., community 6817)
+          \end{itemize}
+          \begin{columns}
+            \column{0.25\textwidth}
+              \begin{center}
+                <<>>=
+                pieLanguage("1340", c("#D81B60"))
+                @
+                Community 1340 (smaller)
+              \end{center}
+            \column{0.25\textwidth}
+              \begin{center}
+                <<>>=
+                pieLanguage("6817", c("#1E88E5", "#D81B60", "#FFC107"))
+                @
+                Community 6817 (bigger)
+              \end{center}
+            \column{0.25\textwidth}
+              \begin{center}
+                <<>>=
+                pieLanguage("1291", c("#1E88E5", "#D81B60", "#FFC107"))
+                @
+                Community 1291 (bigger still)
+              \end{center}
+            \column{0.25\textwidth}
+              \begin{center}
+                <<>>=
+                pieLanguage("1032", c("#1E88E5", "#D81B60", "#FFC107"))
+                @
+                Community 1032 (biggest)
+              \end{center}
+          \end{columns}
+        \end{block}
+
+        \begin{columns}
+          \column{0.4\textwidth}
+            \begin{block}{The outlier}
+              The only French user of (lol) in community 1340: \alert{In-degree = 0}, out-degree = 50
+              \begin{center}
+                \includegraphics[scale=0.95]{ego_fury.png}
+              \end{center}
+            \end{block}
+          \column{0.59\textwidth}
+            \begin{block}{}
+              There's a statistical relationship between community and province ($P < \Sexpr{round_any(fisher.test(commByProvince, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}$), though its far from exclusively one province per community
+              <<fig.height = 9.5, fig.width = 18>>=
+              barCommByProv
+              @
+            \end{block}
+        \end{columns}
+
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      % Right column (discussion)    %
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      \column{0.19\textwidth}
+        \begin{block}{Conclusion}
+          The lexical variable (lol) as used in French tweets \emph{do} vary according to detected community
+          \begin{itemize}
+            \item The higher the presence of English, the more likely the use of the variant \lexi{lol}
+          \end{itemize}
+        \end{block}
+
+        \begin{block}{Discussion}
+          In online communities, French can be locally dominant but otherwise a minority, just as in geographical Maritime communities
+          \begin{itemize}
+            \item This appears to impact the way (lol) is used from community to community
+          \end{itemize}
+          Some users produce \emph{only} the variant \lexi{lol} in French tweets
+          \begin{itemize}
+            \item e.g., bloggercharles in the large, heavily English community 1097
+            \item These users may not have \lexi{mdr} in their mental grammars
+          \end{itemize}
+          The methods used here highlight the importance of interactions more than other community concepts
+          \begin{itemize}
+            \item Detected communities are complementary to other concepts
+            \item e.g., Detect communities first, then do an ethnography
+          \end{itemize}
+        \end{block}
+
+        \begin{block}{References}
+          \printbibliography
+        \end{block}
+    \end{columns}
+  \end{frame}
+\end{document}
