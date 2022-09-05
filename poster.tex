@@ -2,7 +2,57 @@
 % Compile with XeLaTeX %
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass{beamer}
+\documentclass{beamer}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
   % Beamer settings
   \usetheme{CambridgeUS}
   \usecolortheme{seagull}
@@ -46,20 +96,11 @@
   \newcommand{\sepunits}{\rule{1cm}{0pt}\hrulefill\rule{1cm}{0pt} \\}
   \newcommand{\beamfont}[1]{\usebeamerfont{#1}\usebeamercolor[fg]{#1}}
   \renewcommand*{\bibfont}{\tiny}
-
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
   % knitr stuff
-  <<settings_load_scripts, echo = FALSE>>=
-  read_chunk("analysis.R")
-  opts_chunk$set(echo = FALSE,
-                 warning = FALSE,
-                 message = FALSE,
-                 results = "asis",
-                 fig.height = 6,
-                 fig.width = 6)
-  @
-  <<load_packages_functions_data>>=
-  @
+
+
   \begin{frame}
     %%%%%%%%%%
     % Header %
@@ -134,7 +175,7 @@
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       \column{0.6\textwidth}
         \begin{block}{General results (Fisher's exact and Cramér's $V$)}
-          Detected community is significant ($P < \Sexpr{round_any(fisher.test(lolByCommunity, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}, V \approx \Sexpr{round(cramersV(lolByCommunity), 2)}$ compared to $P < \Sexpr{round_any(fisher.test(lolByCity, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}, V \approx \Sexpr{round(cramersV(lolByCity), 2)}$ for city and $P < \Sexpr{round_any(fisher.test(lolByProvince, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}, V \approx \Sexpr{round(cramersV(lolByProvince), 2)}$ for province)
+          Detected community is significant ($P < 0.0005, V \approx 0.63$ compared to $P < 0.0005, V \approx 0.59$ for city and $P < 0.0005, V \approx 0.36$ for province)
           \begin{columns}[t]
             \column{0.5\textwidth}
               \begin{center}
@@ -144,15 +185,15 @@
                   \multicolumn{4}{c}{French tweets only}                                                                                             & \multicolumn{4}{c}{Whole community} \\
                   Community & lol                                   & mdr                                   & ptdr                                   & Mode & $D$ (spread) & Members & Density \\
                   \hline
-                  173       & \Sexpr{lolByCommunity["173", "lol"]}  & \Sexpr{lolByCommunity["173", "mdr"]}  & \Sexpr{lolByCommunity["173", "ptdr"]}  & lol  & 0.350        & 2,480   & 0.000 \\
-                  322       & \Sexpr{lolByCommunity["322", "lol"]}  & \Sexpr{lolByCommunity["322", "mdr"]}  & \Sexpr{lolByCommunity["322", "ptdr"]}  & mdr  & 0.000        & 19      & 0.053 \\
-                  572       & \Sexpr{lolByCommunity["572", "lol"]}  & \Sexpr{lolByCommunity["572", "mdr"]}  & \Sexpr{lolByCommunity["572", "ptdr"]}  & lol  & 0.179        & 3,601   & 0.000 \\
-                  1291      & \Sexpr{lolByCommunity["1291", "lol"]} & \Sexpr{lolByCommunity["1291", "mdr"]} & \Sexpr{lolByCommunity["1291", "ptdr"]} & lol  & 0.321        & 1,073   & 0.001 \\
-                  1340      & \Sexpr{lolByCommunity["1340", "lol"]} & \Sexpr{lolByCommunity["1340", "mdr"]} & \Sexpr{lolByCommunity["1340", "ptdr"]} & mdr  & 0.000        & 33      & 0.036 \\
-                  1782      & \Sexpr{lolByCommunity["1782", "lol"]} & \Sexpr{lolByCommunity["1782", "mdr"]} & \Sexpr{lolByCommunity["1782", "ptdr"]} & ptdr & 0.000        & 2       & 0.500 \\
-                  2305      & \Sexpr{lolByCommunity["2305", "lol"]} & \Sexpr{lolByCommunity["2305", "mdr"]} & \Sexpr{lolByCommunity["2305", "ptdr"]} & mdr  & 0.000        & 4       & 0.250 \\
-                  6445      & \Sexpr{lolByCommunity["6445", "lol"]} & \Sexpr{lolByCommunity["6445", "mdr"]} & \Sexpr{lolByCommunity["6445", "ptdr"]} & mdr  & 0.000        & 2       & 0.500 \\
-                  6744      & \Sexpr{lolByCommunity["6744", "lol"]} & \Sexpr{lolByCommunity["6744", "mdr"]} & \Sexpr{lolByCommunity["6744", "ptdr"]} & mdr  & 0.000        & 12      & 0.083
+                  173       & 0  & 1  & 1  & lol  & 0.350        & 2,480   & 0.000 \\
+                  322       & 0  & 1  & 0  & mdr  & 0.000        & 19      & 0.053 \\
+                  572       & 0  & 1  & 0  & lol  & 0.179        & 3,601   & 0.000 \\
+                  1291      & 0 & 11 & 0 & lol  & 0.321        & 1,073   & 0.001 \\
+                  1340      & 0 & 23 & 0 & mdr  & 0.000        & 33      & 0.036 \\
+                  1782      & 0 & 0 & 1 & ptdr & 0.000        & 2       & 0.500 \\
+                  2305      & 0 & 1 & 0 & mdr  & 0.000        & 4       & 0.250 \\
+                  6445      & 0 & 1 & 0 & mdr  & 0.000        & 2       & 0.500 \\
+                  6744      & 0 & 3 & 0 & mdr  & 0.000        & 12      & 0.083
                 \end{tabular}
               \end{center}
             \column{0.5\textwidth}
@@ -163,16 +204,16 @@
                   \multicolumn{4}{c}{French tweets only}                                                                                             & \multicolumn{4}{c}{Whole community} \\
                   Community & lol                                   & mdr                                   & ptdr                                   & Mode & $D$ (spread) & Members & Density \\
                   \hline
-                  302       & \Sexpr{lolByCommunity["302", "lol"]}  & \Sexpr{lolByCommunity["302", "mdr"]}  & \Sexpr{lolByCommunity["302", "ptdr"]}  & lol  & 0.272        & 17,279  & 0.000\\
-                  756       & \Sexpr{lolByCommunity["756", "lol"]}  & \Sexpr{lolByCommunity["756", "mdr"]}  & \Sexpr{lolByCommunity["756", "ptdr"]}  & lol  & 0.694        & 980     & 0.001 \\
-                  799       & \Sexpr{lolByCommunity["799", "lol"]}  & \Sexpr{lolByCommunity["799", "mdr"]}  & \Sexpr{lolByCommunity["799", "ptdr"]}  & mdr  & 0.180        & 33      & 0.030 \\
-                  1032      & \Sexpr{lolByCommunity["1032", "lol"]} & \Sexpr{lolByCommunity["1032", "mdr"]} & \Sexpr{lolByCommunity["1032", "ptdr"]} & lol  & 0.188        & 22,531  & 0.000 \\
-                  1097      & \Sexpr{lolByCommunity["1097", "lol"]} & \Sexpr{lolByCommunity["1097", "mdr"]} & \Sexpr{lolByCommunity["1097", "ptdr"]} & lol  & 0.152        & 2,955   & 0.000 \\
-                  1227      & \Sexpr{lolByCommunity["1227", "lol"]} & \Sexpr{lolByCommunity["1227", "mdr"]} & \Sexpr{lolByCommunity["1227", "ptdr"]} & lol  & 0.153        & 2,214   & 0.000 \\
-                  1917      & \Sexpr{lolByCommunity["1917", "lol"]} & \Sexpr{lolByCommunity["1917", "mdr"]} & \Sexpr{lolByCommunity["1917", "ptdr"]} & lol  & 0.481        & 4,432   & 0.000 \\
-                  2067      & \Sexpr{lolByCommunity["2067", "lol"]} & \Sexpr{lolByCommunity["2067", "mdr"]} & \Sexpr{lolByCommunity["2067", "ptdr"]} & mdr  & 0.616        & 44      & 0.023 \\
-                  2265      & \Sexpr{lolByCommunity["2265", "lol"]} & \Sexpr{lolByCommunity["2265", "mdr"]} & \Sexpr{lolByCommunity["2265", "ptdr"]} & lol  & 0.440        & 242     & 0.004 \\
-                  6817      & \Sexpr{lolByCommunity["6817", "lol"]} & \Sexpr{lolByCommunity["6817", "mdr"]} & \Sexpr{lolByCommunity["6817", "ptdr"]} & lol  & 0.245        & 592     & 0.002
+                  302       & 1  & 0  & 0  & lol  & 0.272        & 17,279  & 0.000\\
+                  756       & 1  & 18  & 16  & lol  & 0.694        & 980     & 0.001 \\
+                  799       & 3  & 32  & 0  & mdr  & 0.180        & 33      & 0.030 \\
+                  1032      & 2 & 0 & 0 & lol  & 0.188        & 22,531  & 0.000 \\
+                  1097      & 4 & 0 & 0 & lol  & 0.152        & 2,955   & 0.000 \\
+                  1227      & 1 & 0 & 0 & lol  & 0.153        & 2,214   & 0.000 \\
+                  1917      & 1 & 5 & 0 & lol  & 0.481        & 4,432   & 0.000 \\
+                  2067      & 6 & 13 & 8 & mdr  & 0.616        & 44      & 0.023 \\
+                  2265      & 1 & 3 & 1 & lol  & 0.440        & 242     & 0.004 \\
+                  6817      & 7 & 2 & 0 & lol  & 0.245        & 592     & 0.002
                 \end{tabular}
               \end{center}
           \end{columns}
@@ -186,30 +227,30 @@
           \begin{columns}
             \column{0.25\textwidth}
               \begin{center}
-                <<>>=
-                pieLanguage("1340", c("#D81B60"))
-                @
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-1-1} 
+
                 Community 1340 (smaller)
               \end{center}
             \column{0.25\textwidth}
               \begin{center}
-                <<>>=
-                pieLanguage("6817", c("#1E88E5", "#D81B60", "#FFC107"))
-                @
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-2-1} 
+
                 Community 6817 (bigger)
               \end{center}
             \column{0.25\textwidth}
               \begin{center}
-                <<>>=
-                pieLanguage("1291", c("#1E88E5", "#D81B60", "#FFC107"))
-                @
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-3-1} 
+
                 Community 1291 (bigger still)
               \end{center}
             \column{0.25\textwidth}
               \begin{center}
-                <<>>=
-                pieLanguage("1032", c("#1E88E5", "#D81B60", "#FFC107"))
-                @
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-4-1} 
+
                 Community 1032 (biggest)
               \end{center}
           \end{columns}
@@ -218,17 +259,17 @@
         \begin{columns}
           \column{0.4\textwidth}
             \begin{block}{The outlier}
-              The only French user of (lol) in community 1291: \alert{In-degree = 0}, out-degree = 50
+              The only French user of (lol) in community 1340: \alert{In-degree = 0}, out-degree = 50
               \begin{center}
                 \includegraphics[scale=0.95]{ego_fury.png}
               \end{center}
             \end{block}
           \column{0.59\textwidth}
             \begin{block}{}
-              There's a statistical relationship between community and province ($P < \Sexpr{round_any(fisher.test(commByProvince, simulate.p.value = TRUE)$p.value, 0.0005, f = ceiling)}$), though its far from exclusively one province per community
-              <<fig.height = 9.5, fig.width = 18>>=
-              barCommByProv
-              @
+              There's a statistical relationship between community and province ($P < 0.0005$), though its far from exclusively one province per community
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-5-1} 
+
             \end{block}
         \end{columns}
 
